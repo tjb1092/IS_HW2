@@ -3,11 +3,12 @@ import random
 import math
 import matplotlib.pyplot as plt
 
+
 def data_load(fn, class_label, data_array):
 	with open(fn) as f:
-		stress = f.readlines()
+		contents = f.readlines()
 
-	for data in stress:
+	for data in contents:
 		parsedData = data.split("\t")
 		parsedData[1] = parsedData[1][:-1]
 		data_array.append([float(parsedData[0]), float(parsedData[1]), class_label])
