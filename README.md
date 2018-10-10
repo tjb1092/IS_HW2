@@ -17,6 +17,22 @@ _______________________________
 
 4.) KNN. In test set, take data point.
 
-4.1) loop through each point in the training sample. Compute the euclidean distance.
-4.2) Keep a list of the smallest k distances.
-4.3) assign class to new sample, check if it is correct -> increment FP/TP, FN/TN rates.
+4.1) loop through each point in the training sample. Compute the euclidean distance. (done)
+4.2) Keep a list of the smallest k distances. (done)
+4.3) assign class to new sample, check if it is correct (done)
+
+Things I need to calculate:
+- Hit Rate, Sensitivity, Specificity, PPV, NPV (done)
+
+4.5) plot points w/ heuristically defined boundary line.
+4.5.1) scatter training points with dots. color by class
+4.5.2) scatter test points as slightly bigger x's. color by predicted class
+4.5.3) loop through a grid of points in the range of H/W. Use KNN to pick class.
+4.5.4) scatter grid as small dots. color by predicted class.   
+
+5.) Perceptron
+
+5.1) Initialize weight matrix (two values for 2D space) so line is intersecting
+the data cloud somewhere (take two points from each class and use point slope)
+5.2) for each epoch, loop through each training point and calculate yhat
+5.2.5) adjust weights via formulas
