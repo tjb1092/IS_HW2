@@ -4,21 +4,26 @@ import matplotlib.pyplot as plt
 from data_load import preprocessData
 from knn import calculate_performance
 
-def eval_Model(data, wi, wi0, mode):
+def eval_Model(data, wi, wi0, mode, metrics):
 	counter = 0
-	y_hat = np.zeros(data["y_test"].shape)
+	y_hat = np.zeros(data["y_{}".format(mode)].shape)
 	for k, x_k in enumerate(data["x_{}".format(mode)]):
 		if np.dot(wi, x_k.T) > -wi0:
 			y_hatk = 1
 		else:
 			y_hatk = 0
-		y_hat.append(y_hatk)
+		y_hat[k] = y_hatk
 		y_k = data["y_{}".format(mode)][k]
 		if y_k == y_hatk:
 			counter += 1  # Keep track of training accuracy
-	print("{} Accuracy: {}".format(mode, counter/len(data["x_{}".format(mode)])))
 
-	return calculate_performance(np.array(y_hat), data["y_{}".format(mode)])
+	print("{} Hit Rate: {}".format(mode, counter/len(data["x_{}".format(mode)])))
+
+	if metrics:
+		return calculate_performance(np.array(y_hat), data["y_{}".format(mode)])
+	else:
+		# 1 - (Correct guesses / total number of samples).
+		return 1 - (counter/len(data["x_{}".format(mode)]))
 
 
 
@@ -49,24 +54,23 @@ def perceptron_train(data, epochs, LR):
 
 	wi = np.array([[wi1, wi2]])
 
-	eval_Model(data, wi, wi0, "train")
+
 	fig, ax = plt.subplots()
 	x1_plt = np.arange(0,1,1e-4)
 	x2_plt = (-1./wi[0,1])*(x1_plt*wi[0,0]+wi0)
 	ax.plot(x1_plt,x2_plt, color='b', linewidth=1.0)
+
+	epoch_arr = []
+	err_rate_train = []
+	err_rate_test = []
 	for epoch in range(epochs):
 		# Training phase
 		counter = 0
-		if epoch == epochs-1:
-			y_hat = []  # Store the y_hat values for the last training pass.
 		for k, x_k in enumerate(data["x_train"]):
 			if np.dot(wi, x_k.T) > -wi0:
 				y_hatk = 1
 			else:
 				y_hatk = 0
-
-			if epoch == epochs-1:
-				y_hat.append(y_hatk)
 
 			y_k = data["y_train"][k]
 			if y_k == y_hatk:
@@ -74,18 +78,19 @@ def perceptron_train(data, epochs, LR):
 
 			wi = wi + LR * (y_k- y_hatk) * x_k
 			wi0 = wi0 + LR * (y_k - y_hatk)
-		if epoch % 20 == 0:
-			print("Epoch: {} Training Accuracy: {:2f}".format(epoch, counter/k))
+		if epoch % 50 == 0:
+			epoch_arr.append(epoch)
+			err_rate_train.append(eval_Model(data, wi, wi0, "train", 0))
+			err_rate_test.append(eval_Model(data, wi, wi0, "test", 0))
 
 	# Evaluate the performance metrics after training on the training set
-	Metrics_train = eval_Model(data, wi, wi0, "train")
+	Metrics_train = eval_Model(data, wi, wi0, "train", 1)
 	# " " on the testing set
-	Metrics_test = eval_Model(data, wi, wi0, "test")
+	Metrics_test = eval_Model(data, wi, wi0, "test", 1)
 
 	# Plot performance metric bar charts
 	"""
-	fig, ax = plt.subplot	print(wi[0,0])
-	print(wi[0,1])s(1,2)
+	fig, ax = plt.subplots()
 	index = np.arange(len(Metrics_train))
 	ax[0].bar(index, Metrics_train)
 	ax[0].set_ylabel("Value")
@@ -105,6 +110,11 @@ def perceptron_train(data, epochs, LR):
 	ax.plot(x1_plt,x2_plt, color='r', linewidth=2.0)
 	ax.set_xlim([0,1])
 	ax.set_ylim([0,1])
+	plt.show()
+
+	fig, ax = plt.subplots()
+	ax.plot(epoch_arr, err_rate_train)
+	ax.plot(epoch_arr,err_rate_test )
 	plt.show()
 
 	return wi, wi0  # Return trained weights for plotting

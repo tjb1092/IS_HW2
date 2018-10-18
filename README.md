@@ -33,6 +33,17 @@ Things I need to calculate:
 5.) Perceptron
 
 5.1) Initialize weight matrix (two values for 2D space) so line is intersecting
-the data cloud somewhere (take two points from each class and use point slope)
-5.2) for each epoch, loop through each training point and calculate yhat
-5.2.5) adjust weights via formulas
+the data cloud somewhere (take two points from each class and use point slope) (done)
+5.2) for each epoch, loop through each training point and calculate that (done)
+5.2.5) adjust weights via formulas (done. Check that dot product is working right)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55555
+10/18
+
+Todo:
+- Validate perceptron operation.
+- Add Error Rate graph (once per 50 epochs) over training and testing data. This should be able to be done in a single line as an array operator.s
+- Plot H-W plane for perceptron
+- Add legend to the KNN HW plane
+- radius -NN algo
+- Augment the KNN for relative distance weighting
