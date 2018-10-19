@@ -15,6 +15,23 @@ def data_load(fn, class_label, data_array):
 	return data_array
 
 
+def create_train_test_split(x, y, percent):
+
+	# Create Train/Test Split
+	d_len = len(x)
+	train_index = random.sample(range(d_len - 1), math.ceil(percent*d_len))
+	# Compute the remaining 20% of samples for the test set
+	test_index = list(set(range(d_len-1)) - set(train_index))
+
+	x_train = x[train_index]
+	y_train = y[train_index]
+
+	x_test = x[test_index]
+	y_test = y[test_index]
+
+	# create data dict to pass up to other functions
+	return {"x_train": x_train, "y_train": y_train, "x_test": x_test, "y_test": y_test}
+
 def preprocessData():
 		# Read in data
 		fn_stressed = "stressed.txt"
@@ -31,7 +48,7 @@ def preprocessData():
 		x = d_array[:, 0:2]
 		y = d_array[:,2]
 
-		d_len = len(x)
+
 		# Normalize W and H
 
 		# Get max and min values
@@ -41,21 +58,7 @@ def preprocessData():
 		# Normalize x's between 0 and 1
 		norm_x = (x - mins)/ (maxs-mins)
 
-		# Create Train/Test Split
-		train_percent = 0.8
-		train_index = random.sample(range(d_len - 1), math.ceil(train_percent*d_len))
-		# Compute the remaining 20% of samples for the test set
-		test_index = list(set(range(len(d_array-1))) - set(train_index))
-
-		x_train = norm_x[train_index]
-		y_train = y[train_index]
-
-		x_test = norm_x[test_index]
-		y_test = y[test_index]
-
-		# create data dict to pass up to other functions
-		data = {"x_train": x_train, "y_train": y_train, "x_test": x_test, "y_test": y_test}
-		return data
+		return norm_x, y
 
 def main():
 	preprocessData()
