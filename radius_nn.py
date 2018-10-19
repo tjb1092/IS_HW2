@@ -86,8 +86,6 @@ def main():
 
     Sweep_Param(x, y, R_arr, 1)
 
-
-
     # Pick best and redo to get the boundary plot
 
 if __name__ == "__main__":
