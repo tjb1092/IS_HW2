@@ -32,7 +32,7 @@ def calculate_performance(ybar, y):
 def knn(data, k):
 
 	# for each test data point,
-	ybar = np.zeros(len(data["x_test"]))
+	ybar = np.zeros((1,len(data["x_test"])))
 	for i, x_test in enumerate(data["x_test"]):
 		#loop through each training point.
 		dist_list = []  # initialize a Neighbor list
@@ -62,13 +62,13 @@ def knn(data, k):
 				one_cnt += (1/element[0])
 		# Compare computed score for the classes
 		if one_cnt > zero_cnt:
-			ybar[i] = 1  # Assume 0 otherwise
+			ybar[0,i] = 1  # Assume 0 otherwise
 
 	return ybar
 
 
 def main():
-	k = 13
+	k = 11
 	x, y = preprocessData()  # Load data
 	data = create_train_test_split(x, y, 0.8)  # Create splits
 
@@ -77,8 +77,13 @@ def main():
 	ybar = knn(data, k) # Perform k-NN on test data, return the predicted classes.
 
 	# Plot the W-H data colored by class.
-	ax_scatter.scatter(data["x_train"][:,0], data["x_train"][:,1], c=data["y_train"], s=10, marker="D")
-	ax_scatter.scatter(data["x_test"][:,0], data["x_test"][:,1], c=ybar, s=60, marker="x")
+	labels = ["Unstressed", "Stressed"]
+	colors = ["b", "r"]
+	for i in range(2):
+		plt_index = data["y_train"] == i
+		plt_test_index = data["y_test"] == i
+		ax_scatter.scatter(data["x_train"][plt_index,0], data["x_train"][plt_index,1], c=colors[i], s=10, marker="D", label="{} - Train".format(labels[i]))
+		ax_scatter.scatter(data["x_test"][plt_test_index,0], data["x_test"][plt_test_index,1], c=colors[i], s=60, marker="x", label="{} - Test".format(labels[i]))
 
 	# Create a test vector to plot the decision boundary.
 	d_testx = np.arange(0,1.01,1e-2)
@@ -87,10 +92,16 @@ def main():
 
 	ybar_grid = knn(data, k)  # predict classes using the grid test points
 	# Plot the deicison boundary
-	ax_scatter.scatter(data["x_test"][:,0], data["x_test"][:,1], c=ybar_grid, s=1)
+	labels = ["Unstressed", "Stressed"]
+	colors = ["b", "r"]
+	for i in range(2):
+		plt_index = ybar_grid[0,:] == i
+		ax_scatter.scatter(data["x_test"][plt_index,0], data["x_test"][plt_index,1], c=colors[i], s=0.25)
+
 	ax_scatter.set_xlabel("W normalized")
 	ax_scatter.set_ylabel("H normalized")
 	ax_scatter.set_title("H-W plane with decision boudary for k-NN with k={}".format(k))
+	ax_scatter.legend()
 	fig_scatter.show()
 
 	# Calculate performance metrics for the test predictions
@@ -100,7 +111,7 @@ def main():
 	index = np.arange(len(Metrics))
 	ax.bar(index, Metrics)
 	ax.set_ylabel("Value")
-	ax.set_title("Performance Metrics for KNN Classifier with K={}".format(k))
+	ax.set_title("Performance Metrics for KNN Classifier with k={}".format(k))
 	ax.set_xticklabels(('', 'Hit Rate', 'Specificity','Sensitivity', 'PPV', 'NPV'))
 	fig.show()
 

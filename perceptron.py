@@ -96,17 +96,27 @@ def perceptron_train(data, epochs, LR):
 	print("Best Error: {} \n Best Epoch: {}".format(best_err, best_epoch))
 	fig, ax = plt.subplots()
 	# Plot training and test data
-	ax.scatter(data["x_train"][:,0], data["x_train"][:,1], c=data["y_train"], label="Training Data")
+	labels = ["Unstressed", "Stressed"]
+	colors = ["b", "r"]
+	for i in range(2):
+		plt_index = data["y_train"] == i
+		plt_test_index = data["y_test"] == i
+		ax.scatter(data["x_train"][plt_index,0], data["x_train"][plt_index,1], c=colors[i], s=20, label="{} - Train".format(labels[i]))
+		ax.scatter(data["x_test"][plt_test_index,0], data["x_test"][plt_test_index,1], c=colors[i], s=60, marker="x", label="{} - Test".format(labels[i]))
+
 
 	# Calculate points on trained boundary line
 	x1_plt_trained = np.arange(0,1,1e-4)
 	x2_plt_trained = (-1./wi_best[0,1])*(x1_plt_trained*wi_best[0,0]+wi0_best)
 	# Plot initial and trained boundary lines
-	ax.plot(x1_plt_init,x2_plt_init, color='b', label="Initial Boundary", linewidth=1.0)
-	ax.plot(x1_plt_trained,x2_plt_trained, color='r', label="Trained Boundary", linewidth=2.0)
+	ax.plot(x1_plt_init,x2_plt_init, color='y', label="Initial Boundary", linewidth=1.0)
+	ax.plot(x1_plt_trained,x2_plt_trained, color='g', label="Trained Boundary", linewidth=2.0)
 	ax.set_xlim([0,1])
 	ax.set_ylim([0,1])
 	ax.legend()
+	ax.set_xlabel("W normalized")
+	ax.set_ylabel("H normalized")
+	ax.set_title("H-W plane with decision boudary for Perceptron with $\eta$={}".format(LR))
 	fig.show()
 	# Plot error rate per epoch
 	fig, ax = plt.subplots()
@@ -136,7 +146,7 @@ def perceptron_train(data, epochs, LR):
 	ax[1].set_ylim([0, 1])
 	ax[1].set_title("Test Performance".format(LR))
 	ax[1].set_xticklabels(('', 'Hit Rate', 'Specificity','Sensitivity', 'PPV', 'NPV'))
-	fig.suptitle("Performance Metrics for Perceptron Classifier with LR={}")
+	fig.suptitle("Performance Metrics for Perceptron Classifier with $\eta$={}".format(LR))
 	plt.show()
 
 	return wi_best, wi0_best  # Return trained weights for plotting
