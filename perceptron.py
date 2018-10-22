@@ -5,34 +5,23 @@ from data_load import preprocessData, create_train_test_split
 from knn import calculate_performance
 
 def eval_Model(data, wi, wi0, mode, metrics):
-	counter = 0
-	y_hat = np.zeros(data["y_{}".format(mode)].shape)
-	for k, x_k in enumerate(data["x_{}".format(mode)]):
+	# Can evaluate entire data set in one dot product operation
+	y_hat = 1*(np.dot(wi, data["x_{}".format(mode)].T) > -wi0)
+	y_k = data["y_{}".format(mode)]
+	correct = np.sum(1*(y_hat == y_k))
 
-		if np.dot(wi, x_k.T) > -wi0:
-			y_hatk = 1
-		else:
-			y_hatk = 0
-		y_hat[k] = y_hatk
-
-		y_k = data["y_{}".format(mode)][k]
-		if y_k == y_hatk:
-			counter += 1  # Keep track of training accuracy
-
-	print("{} Hit Rate: {}".format(mode, counter/len(data["x_{}".format(mode)])))
+	Hit_Rate = correct/len(data["x_{}".format(mode)])
+	print("{} Hit Rate: {}".format(mode, Hit_Rate))
 
 	if metrics:
-		return calculate_performance(np.array(y_hat), data["y_{}".format(mode)])
+		return calculate_performance(y_hat, data["y_{}".format(mode)])
 	else:
-		# 1 - (Correct guesses / total number of samples).
-		return 1 - (counter/len(data["x_{}".format(mode)]))
-
-
+		# Error Rate = 1-Hit_Rate
+		return 1 - Hit_Rate
 
 def perceptron_train(data, epochs, LR):
 
 	# First, initialize weights. For 2D case, there are three weights.
-
 	# Pick two points, one in class 1, one in class 0.
 	p1 = data["x_train"][0]
 	if data["y_train"][0] == 1:
@@ -54,10 +43,13 @@ def perceptron_train(data, epochs, LR):
 	wi2 = (2.0 * (p2[0] - p1[0])) / ((p1[1] - p2[1]) * (p1[0] + p2[0]) - (p1[1] + p2[1]) * (p2[0] - p1[0]))
 	wi1 = ((p2[1] - p1[1]) / (p2[0] - p1[0])) * wi2
 
+	#Negates all of the wieghts so that the decision boundary comparison works properly.
 	wi = np.array([[-wi1, -wi2]])
 
+	# record initial boundary line
 	x1_plt_init = np.arange(0,1,1e-4)
 	x2_plt_init = (-1./wi[0,1])*(x1_plt_init*wi[0,0]+wi0)
+
 
 	epoch_arr = []
 	err_rate_train = []
@@ -70,11 +62,10 @@ def perceptron_train(data, epochs, LR):
 	best_epoch = 0
 
 	for epoch in range(epochs):
-		# Training phase
+		# For each epoch, loop through each data point and update weights
 		counter = 0
-		acc_wi = np.zeros(wi.shape)
-		acc_w0 = 0
 		for k, x_k in enumerate(data["x_train"]):
+			# Evaluate predicted class label
 			if  np.dot(wi, x_k.T) > -wi0:
 				y_hatk = 1
 			else:
@@ -84,40 +75,40 @@ def perceptron_train(data, epochs, LR):
 			if y_k == y_hatk:
 				counter += 1  # Keep track of training accuracy
 
+			# Weight update policy
 			wi = wi + LR * (y_k - y_hatk) * x_k
 			wi0 = wi0 + LR * (y_k - y_hatk)
-			x2_plt_2 = (-1./wi[0,1])*(x1_plt_init*wi[0,0]+wi0)
 
-		#wi = wi + acc_wi
-		#wi0 = wi0 + acc_w0
 		if epoch % 50 == 0:
 			print(wi, wi0)
 
 			epoch_arr.append(epoch)
 			err_rate_train.append(eval_Model(data, wi, wi0, "train", 0))
 			err_rate_test.append(eval_Model(data, wi, wi0, "test", 0))
-
+		# Check to see if newest test error is better than previous epoch
 		if err_rate_test[-1] < best_err:
+			# If so, then save weights and error rate
 			wi_best = wi
 			wi0_best = wi0
 			best_err = err_rate_test[-1]
 			best_epoch = epoch
 
-	fig, ax = plt.subplots()
-
 	print("Best Error: {} \n Best Epoch: {}".format(best_err, best_epoch))
+	fig, ax = plt.subplots()
+	# Plot training and test data
 	ax.scatter(data["x_train"][:,0], data["x_train"][:,1], c=data["y_train"], label="Training Data")
+
+	# Calculate points on trained boundary line
 	x1_plt_trained = np.arange(0,1,1e-4)
 	x2_plt_trained = (-1./wi_best[0,1])*(x1_plt_trained*wi_best[0,0]+wi0_best)
-
+	# Plot initial and trained boundary lines
 	ax.plot(x1_plt_init,x2_plt_init, color='b', label="Initial Boundary", linewidth=1.0)
-
 	ax.plot(x1_plt_trained,x2_plt_trained, color='r', label="Trained Boundary", linewidth=2.0)
 	ax.set_xlim([0,1])
 	ax.set_ylim([0,1])
 	ax.legend()
 	fig.show()
-
+	# Plot error rate per epoch
 	fig, ax = plt.subplots()
 	ax.plot(epoch_arr, err_rate_train, label="Training Error Rate")
 	ax.plot(epoch_arr,err_rate_test, label="Test Error Rate")
@@ -154,12 +145,13 @@ def perceptron_train(data, epochs, LR):
 
 def main():
 	LR = 1e-2
-	x, y = preprocessData()
+	Epochs = 2000
+	x, y = preprocessData()  # Load Data
 	data = create_train_test_split(x, y, 0.8)
 
-	wi, wi0 = perceptron_train(data, 2000, LR)
+	# Train weights using perceptron algorithm
+	wi, wi0 = perceptron_train(data, Epochs, LR)
 
-	# Move this outside of here. Return the weight array and plot outside b/c I need all data.
 	fig, ax = plt.subplots()
 	ax.scatter(data["x_train"][:,0], data["x_train"][:,1], c=data["y_train"])
 	x1_plt = np.arange(0,1,1e-4)
