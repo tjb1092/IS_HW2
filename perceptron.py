@@ -162,15 +162,5 @@ def main():
 	# Train weights using perceptron algorithm
 	wi, wi0 = perceptron_train(data, Epochs, LR)
 
-	fig, ax = plt.subplots()
-	ax.scatter(data["x_train"][:,0], data["x_train"][:,1], c=data["y_train"])
-	x1_plt = np.arange(0,1,1e-4)
-	x2_plt = (-1./wi[0,1])*(x1_plt*wi[0,0]+wi0)
-	ax.plot(x1_plt,x2_plt, color='r', linewidth=2.0)
-	ax.set_xlim([0,1])
-	ax.set_ylim([0,1])
-	plt.show()
-
-
 if __name__ == "__main__":
 	main()
