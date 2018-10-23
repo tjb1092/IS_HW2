@@ -94,7 +94,7 @@ def perceptron_train(data, epochs, LR):
 			best_epoch = epoch
 
 	print("Best Error: {} \n Best Epoch: {}".format(best_err, best_epoch))
-	fig, ax = plt.subplots()
+	fig, ax = plt.subplots(figsize=(6,6))
 	# Plot training and test data
 	labels = ["Unstressed", "Stressed"]
 	colors = ["b", "r"]
@@ -116,10 +116,10 @@ def perceptron_train(data, epochs, LR):
 	ax.legend()
 	ax.set_xlabel("W normalized")
 	ax.set_ylabel("H normalized")
-	ax.set_title("H-W plane with decision boudary for Perceptron with $\eta$={}".format(LR))
+	ax.set_title("H-W plane with decision boundary for Perceptron with $\eta$={}".format(LR))
 	fig.show()
 	# Plot error rate per epoch
-	fig, ax = plt.subplots()
+	fig, ax = plt.subplots(figsize=(6,6))
 	ax.plot(epoch_arr, err_rate_train, label="Training Error Rate")
 	ax.plot(epoch_arr,err_rate_test, label="Test Error Rate")
 	ax.set_xlabel("Epoch")
@@ -134,18 +134,18 @@ def perceptron_train(data, epochs, LR):
 	Metrics_test = eval_Model(data, wi_best, wi0_best, "test", 1)
 
 	# Plot performance metric bar charts
-	fig, ax = plt.subplots(1,2)
+	fig, ax = plt.subplots(1,2, figsize=(12,6))
 	index = np.arange(len(Metrics_train))
 	ax[0].bar(index, Metrics_train)
 	ax[0].set_ylabel("Value")
 	ax[0].set_ylim([0, 1])
 	ax[0].set_title("Training Performance".format(LR))
-	ax[0].set_xticklabels(('', 'Hit Rate', 'Specificity','Sensitivity', 'PPV', 'NPV'))
+	ax[0].set_xticklabels(('', 'Hit Rate', 'Sensitivity', 'Specificity', 'PPV', 'NPV'))
 	ax[1].bar(index, Metrics_test)
 	ax[1].set_ylabel("Value")
 	ax[1].set_ylim([0, 1])
 	ax[1].set_title("Test Performance".format(LR))
-	ax[1].set_xticklabels(('', 'Hit Rate', 'Specificity','Sensitivity', 'PPV', 'NPV'))
+	ax[1].set_xticklabels(('', 'Hit Rate', 'Sensitivity', 'Specificity', 'PPV', 'NPV'))
 	fig.suptitle("Performance Metrics for Perceptron Classifier with $\eta$={}".format(LR))
 	plt.show()
 

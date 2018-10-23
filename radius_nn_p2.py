@@ -24,9 +24,9 @@ def radius_nn(data, R):
         # Add the total 1's, and 0's from the point's neighbors
         for element in dist_list:
             if element[1] == 0:
-                zero_cnt += 1
+                zero_cnt += (1./element[0])
             else:
-                one_cnt += 1
+                one_cnt += (1./element[0])
 
         if one_cnt == 0 and zero_cnt == 0:
             # No neighbors in radius, randomly assign.
@@ -63,17 +63,17 @@ def Sweep_Param(x, y, P_arr, P_best, R_K):
     # Each column is a graph of means vs. R for each performance metric.
     means = np.asarray(means)
     stds = np.asarray(stds)
-    label_lst = ['Hit Rate', 'Specificity','Sensitivity', 'PPV', 'NPV']
+    label_lst = ['Hit Rate', 'Sensitivity', 'Specificity', 'PPV', 'NPV']
     if R_K == 1:
         xlab = "Radius-R"
         title = "R"
     else:
-        xlab= "K neighbors"
-        title = "K"
+        xlab= "k neighbors"
+        title = "k"
 
     for i in range(5):
         # For each metric, index the proper column of data and plot
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(6,6))
         ax.errorbar(P_arr, means[:,i], yerr=stds[:,i], fmt='.k', capsize=5)
         ax.set_xlabel(xlab)
         ax.set_ylabel(label_lst[i])
@@ -84,7 +84,7 @@ def Sweep_Param(x, y, P_arr, P_best, R_K):
     # Pick best one and redo to plot decision boundary
     data = create_train_test_split(x, y, 0.8)  # Create splits
 
-    fig_scatter, ax_scatter = plt.subplots()  # Get data for H-W Plane
+    fig_scatter, ax_scatter = plt.subplots(figsize=(6,6))  # Get data for H-W Plane
 
     if R_K == 1:
         ybar = radius_nn(data, P_best)
@@ -122,7 +122,7 @@ def Sweep_Param(x, y, P_arr, P_best, R_K):
 
     ax_scatter.set_xlabel("W normalized")
     ax_scatter.set_ylabel("H normalized")
-    ax_scatter.set_title("Best {}-NN decision boudary with {}={}".format(title[0], title[1], P_best))
+    ax_scatter.set_title("Best {}-NN decision boundary with {}={}".format(title[0], title[1], P_best))
     ax_scatter.legend()
     plt.show()
 
@@ -134,9 +134,10 @@ def main():
     R_min = 0.01
     R_max = 0.3
     iterations = 10  #Number of parameter to try in range.
-    R_best = 0.17
+    R_best = 0.14
     # Create parameter array of Rs to test
     R_arr = np.linspace(R_min, R_max, iterations)
+    print(R_arr)
 
     Sweep_Param(x, y, R_arr, R_best, 1)  # Get the performance for each value of R to try.
 

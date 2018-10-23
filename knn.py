@@ -59,7 +59,7 @@ def knn(data, k):
 			if element[1] == 0:
 				zero_cnt += (1/element[0])
 			else:
-				one_cnt += (1/element[0])
+				one_cnt += (1./element[0])
 		# Compare computed score for the classes
 		if one_cnt > zero_cnt:
 			ybar[0,i] = 1  # Assume 0 otherwise
@@ -72,7 +72,7 @@ def main():
 	x, y = preprocessData()  # Load data
 	data = create_train_test_split(x, y, 0.8)  # Create splits
 
-	fig_scatter, ax_scatter = plt.subplots()  # Get data for H-W Plane
+	fig_scatter, ax_scatter = plt.subplots(figsize=(6,6))  # Get data for H-W Plane
 
 	ybar = knn(data, k) # Perform k-NN on test data, return the predicted classes.
 
@@ -100,19 +100,19 @@ def main():
 
 	ax_scatter.set_xlabel("W normalized")
 	ax_scatter.set_ylabel("H normalized")
-	ax_scatter.set_title("H-W plane with decision boudary for k-NN with k={}".format(k))
+	ax_scatter.set_title("H-W plane with decision boundary for k-NN with k={}".format(k))
 	ax_scatter.legend()
 	fig_scatter.show()
 
 	# Calculate performance metrics for the test predictions
 	Metrics = calculate_performance(ybar, data["y_test"])
 	# Plot each metric as a bar in a bar chart.
-	fig, ax = plt.subplots()
+	fig, ax = plt.subplots(figsize=(6,6))
 	index = np.arange(len(Metrics))
 	ax.bar(index, Metrics)
 	ax.set_ylabel("Value")
 	ax.set_title("Performance Metrics for KNN Classifier with k={}".format(k))
-	ax.set_xticklabels(('', 'Hit Rate', 'Specificity','Sensitivity', 'PPV', 'NPV'))
+	ax.set_xticklabels(('', 'Hit Rate', 'Sensitivity', 'Specificity', 'PPV', 'NPV'))
 	fig.show()
 
 
